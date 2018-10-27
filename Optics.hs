@@ -6,7 +6,9 @@
   InstanceSigs,
   UnicodeSyntax,
   LambdaCase,
-  ScopedTypeVariables
+  ScopedTypeVariables,
+  MultiParamTypeClasses,
+  FunctionalDependencies
 #-}
 
 module Optics where
@@ -268,28 +270,47 @@ instance Monoid a => Choice (Forget a) where
                     Left _ -> mempty
                     Right x -> g x)
 
+
 shopForget :: ∀ a b s t . Shop a b s t -> Forget a s t
 shopForget (Shop f _) = Forget f
 
-class Profunctor p => Viewable p where
-  viewable :: ∀ x y i o . Forget x i o -> p x y -> p i o
+marketForget :: ∀ a b s t . Monoid a => Market a b s t -> Forget a s t
+marketForget (Market (Star f) _) =
+  Forget (\s -> case f s of
+                  Left _ -> mempty
+                  Right a -> a)
 
-newtype StrongView p i o = StrongView { unStrongView :: p i o }
 
-instance Viewable p => Profunctor (StrongView p) where
-  dimap g (StrongView h) = StrongView (dimap g h)
+class Strong p => Gettable p r | p -> r where
+  gettable :: ∀ x y i o . Forget x i o -> p x y -> p i o
 
-instance Viewable p => Strong (StrongView p) where
-  strong s = StrongView . viewable (shopForget s) . unStrongView
-
-instance Viewable (Forget a) where
-  viewable :: ∀ x y i o . Forget x i o -> Forget a x y -> Forget a i o
-  viewable (Forget f) (Forget g) =
+instance Gettable (Forget a) a where
+  gettable :: ∀ x y i o . Forget x i o -> Forget a x y -> Forget a i o
+  gettable (Forget f) (Forget g) =
     Forget (g . f)
 
-type Getter s t a b = ∀ p . Viewable p => StrongView p a b -> StrongView p s t
+type Getter s t a b = ∀ p r . Gettable p r => p a b -> p s t
 
-view :: Getter s t a b -> s -> a
-view f = unForget (unStrongView (f (StrongView (Forget id))))
+type Fold r s t a b = ∀ p . Gettable p r => p a b -> p s t
 
+type AFold r s t a b = Forget r a b -> Forget r s t
+
+view :: AFold a s t a b -> s -> a
+view f = unForget (f (Forget id))
+
+
+{-
+class (Gettable p, Choice p, Monoid r) => MonoidOf p r | p -> r where
+  monoidOf :: ∀ x y i o . Forget x i o -> p x y -> p i o
+-}
+
+{-
+instance Monoid a => MonoidOf (Forget a) a where
+  monoidOf (Forget f) (Forget g) = Forget (g . f)
+
+type Fold r s t a b = ∀ p . MonoidOf p r => p a b -> p s t
+
+foldOf :: ∀ r s t a b . Monoid a => Fold a s t a b -> s -> a
+foldOf f = unForget (f (Forget id))
+-}
 
