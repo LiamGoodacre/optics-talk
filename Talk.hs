@@ -13,6 +13,7 @@
 module Talk where
 
 import Data.Kind
+import Data.Monoid (First(..))
 
 lmap :: (e -> f) -> Either e a -> Either f a
 lmap f = \case
@@ -349,6 +350,13 @@ view ::
   (Forget a a b -> Forget a s t) ->
   s -> a
 view f s = unForget (f (Forget id)) s
+
+preview ::
+  (Forget (First a) a b -> Forget (First a) s t) ->
+  s -> Maybe a
+preview f s =
+  getFirst $
+    unForget (f (Forget (First . Just))) s
 
 
 newtype Re p a b s t =
