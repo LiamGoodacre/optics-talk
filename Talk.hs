@@ -35,7 +35,7 @@ swap = \case
 -- style has a lot of unnecessary noise (but is equivalent).
 
 
-type DataFn a b = a -> b
+type DataFun a b = a -> b
 
 data DataEqual :: Type -> Type -> Type where
   Refl :: ∀ x . DataEqual x x
@@ -64,9 +64,9 @@ type DataPrism' ab st = DataPrism ab ab st st
 type DataEquality' ab st = DataEquality ab ab st st
 
 
-equalFn ::
-  DataEqual a b -> DataFn a b
-equalFn Refl = id
+equalFun ::
+  DataEqual a b -> DataFun a b
+equalFun Refl = id
 
 equalityIso ::
   DataEquality a b s t -> DataIso a b s t
@@ -84,9 +84,9 @@ isoPrism (DataIso sa bt) =
   DataPrism (Right . sa) bt
 
 
-identityFn ::
-  DataFn x x
-identityFn = id
+identityFun ::
+  DataFun x x
+identityFun = id
 
 identityEqual ::
   DataEqual x x
@@ -113,9 +113,9 @@ identityEquality ::
 identityEquality = DataEquality Refl Refl
 
 
-composeFn ::
-  DataFn b c -> (DataFn a) b -> (DataFn a) c
-composeFn f g = f . g
+composeFun ::
+  DataFun b c -> (DataFun a) b -> (DataFun a) c
+composeFun f g = f . g
 
 composeEqual ::
   DataEqual b c -> (DataEqual a) b -> (DataEqual a) c
@@ -147,8 +147,8 @@ composeEquality (DataEquality ix yo) (DataEquality xa by) =
 
 
 -- class Functor f where
-class FnFunctor f where
-  fnMap :: DataFn b c -> f b -> f c
+class FunFunctor f where
+  funMap :: DataFun b c -> f b -> f c
 
 class EqualFunctor f where
   equalMap :: DataEqual b c -> f b -> f c
@@ -173,11 +173,12 @@ class EqualityFunctor p where
   --          :: DataEquality' xy io  -> p xy  -> p io
 
 
-instance FnFunctor ((->) a) where
-  fnMap = composeFn
+instance FunFunctor ((->) a) where
+  funMap = composeFun
 
 --instance EqualFunctor (Equal a) where
 --  equalMap = composeEqual
+
 instance EqualFunctor f where
   equalMap Refl x = x
 
@@ -204,11 +205,19 @@ instance IsoFunctor (DataPrism a b) where
   isoMap = prismMap . isoPrism
 
 
-type Fn b c = ∀ f . FnFunctor f => f b -> f c
+type Fun b c = ∀ f . FunFunctor f => f b -> f c
 type Equal b c = ∀ f . EqualFunctor f => f b -> f c
+
+--   Iso s t a b = ∀ p . Profunctor p => p a b -> p s t
 type Iso a b s t = ∀ p . IsoFunctor p => p a b -> p s t
+
+--   Lens s t a b = ∀ p . Strong p => p a b -> p s t
 type Lens a b s t = ∀ p . LensFunctor p => p a b -> p s t
+
+--   Prism s t a b = ∀ p . Choice p => p a b -> p s t
 type Prism a b s t = ∀ p . PrismFunctor p => p a b -> p s t
+
+--   Equality s t a b = ∀ p . p a b -> p s t
 type Equality a b s t = ∀ p . EqualityFunctor p => p a b -> p s t
 
 
@@ -218,8 +227,8 @@ type Prism' ab st = Prism ab ab st st
 type Equality' ab st = Equality ab ab st st
 
 
-toFn :: DataFn a b -> Fn a b
-toFn = fnMap
+toFun :: DataFun a b -> Fun a b
+toFun = funMap
 
 toEqual :: DataEqual a b -> Equal a b
 toEqual = equalMap
@@ -237,8 +246,8 @@ toEquality :: DataEquality a b s t -> Equality a b s t
 toEquality = equalityMap
 
 
-fromFn :: Fn a b -> DataFn a b
-fromFn f = f identityFn
+fromFun :: Fun a b -> DataFun a b
+fromFun f = f identityFun
 
 fromEqual :: Equal a b -> DataEqual a b
 fromEqual f = f identityEqual
@@ -259,8 +268,8 @@ fromEquality f = f identityEquality
 equal :: Equal a a
 equal = toEqual Refl
 
-fn :: (a -> b) -> Fn a b
-fn f = toFn f
+fun :: (a -> b) -> Fun a b
+fun f = toFun f
 
 iso :: (s -> a) -> (b -> t) -> Iso a b s t
 iso f g = toIso (DataIso f g)
@@ -292,6 +301,15 @@ right = prism (lmap Left) Right
 
 left :: Prism a b (Either a x) (Either b x)
 left = prism (lmap Right . swap) Left
+
+eithered :: Iso' (Either () ()) Bool
+eithered = iso bte etb where
+  bte = \case
+    True -> Right ()
+    False -> Left ()
+  etb = \case
+    Right () -> True
+    Left () -> False
 
 
 instance IsoFunctor (->) where
@@ -370,13 +388,4 @@ re ::
   (Re p a b a b -> Re p a b s t) ->
   p t s -> p b a
 re f = unRe (f (Re id))
-
-eithered :: Iso' (Either () ()) Bool
-eithered = iso bte etb where
-  bte = \case
-    True -> Right ()
-    False -> Left ()
-  etb = \case
-    Right () -> True
-    Left () -> False
 
