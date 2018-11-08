@@ -226,6 +226,7 @@ f :: A -> X
 g :: B -> Y
 TxTComma f g :: TxT (->) (->) A B X Y
 
+{Arrow CAT (TYPE × TYPE) TYPE} :: Kind
 {Arrow CAT (TYPE × TYPE) TYPE}
   = Type -> Type -> Type
 
