@@ -190,7 +190,7 @@ Y :: Type
 f :: X -> Y
 
 {Arrow CAT TYPE TYPE} :: Kind
-{Arrow CAT TYPE TYPE} = Type -> Typ
+{Arrow CAT TYPE TYPE} = Type -> Type
 
 -- Arrow TYPE X _ : Arrow CAT TYPE TYPE
 {Arrow TYPE X _} :: Type -> Type
