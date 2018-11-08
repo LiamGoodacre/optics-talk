@@ -16,9 +16,9 @@ An arrow represents a connection between two objects.
 -- h : Arrow C Z X
 ```
 
-Two arrows with the same source and target aren't necessarily the same arrow.
+For arrow `f`, `X` is the source/domain object, and `Y` is the target/codomain object.
 
-When all arrows are unique, the category is described as 'thin'.
+Two arrows with the same source and target aren't necessarily the same arrow.
 
 For each object there is an identity arrow, whose source and target is that
 object:
@@ -64,12 +64,12 @@ Intuition: a functor is a picture of one category in another.
 
 A hom-set is the collection of arrows from one object to another.
 
-Some hom-sets are types/small-sets.
+Some hom-sets represent types/small-sets.
 
 A category in which every hom-set is a type/set is called 'locally small'.
 
-There is a category CAT in which objects are locally small categories and objects
-are functors.  CAT is not locally small.
+There is a category CAT in which objects represent locally small categories and objects
+represent functors.  CAT is not locally small.
 
 Other than CAT we will only really consider locally small categories.
 
@@ -85,12 +85,33 @@ So we can think of `f` as being a term of type `C X Y`.
 f :: C X Y
 ```
 
-There is a category TYPE whose objects are types and arrows are functions.
+For any two categories C and D, there is a category C × D.
 
-The hom-sets of every locally small category are objects in TYPE.
+Objects in C × D represent pairs of objects, one from C, one from D.
 
-Unsaturated arrow composition `(.)` of a locally small category is itself an
-arrow in TYPE.
+```
+-- A : Object C
+-- B : Object D
+-- (A , B) : Object (C × D)
+```
+
+Arrows in C × D represent pairs of arrows, one from C, one from D.
+
+```
+-- A : Object C
+-- B : Object C
+-- X : Object D
+-- Y : Object D
+-- (A , X) : Object (C × D)
+-- (B , Y) : Object (C × D)
+-- f : Arrow C A B
+-- g : Arrow D X Y
+-- (f , g) : Arrow (C × D) (A , X) (B , Y)
+```
+
+There is a category TYPE whose objects represent types and arrows represent functions.
+
+The hom-sets of every locally small category represent objects in TYPE.
 
 ```
 -- X : Object C
@@ -109,13 +130,17 @@ C X Y :: Type
 
 -- Arrow C Y Z : Object TYPE
 C Y Z :: Type
+```
 
+Unsaturated arrow composition `(.)` of a locally small category is itself an
+arrow in TYPE.
+
+```
 -- (.) : Arrow TYPE (C Y Z) (C X Y -> C X Z)
 (.) :: C Y Z -> C X Y -> C X Z
 ```
 
-Partially applying the hom-set `Arrow C` with a single argument is a functor in
-the other.
+Hom-set 'constructor' `Arrow C X` is a functor from C to TYPE:
 
 ```
 -- X : Object C
@@ -127,6 +152,63 @@ C X Y :: Type
 
 -- A functor from C to TYPE
 -- Arrow C X _ : Arrow CAT C TYPE
-C X :: C -> Type
+
+-- can't write in haskell until
+-- we know what category C is
+```
+
+If we pick category C to be TYPE.
+
+```
+-- X : Object TYPE
+-- Y : Object TYPE
+X :: Type
+Y :: Type
+
+-- Arrow TYPE X Y : Object TYPE
+X -> Y :: Type
+
+-- f : Arrow TYPE X Y
+f :: X -> Y
+
+-- Arrow CAT TYPE TYPE
+Type -> Type :: Kind
+
+-- Arrow C X _ : Arrow CAT TYPE TYPE
+(->) X :: Type -> Type
+
+-- TODO: fmap
+
+```
+
+If we pick category C to be TYPE × TYPE.
+
+```
+-- (A , B) : Object (TYPE × TYPE)
+-- (X , Y) : Object (TYPE × TYPE)
+A :: Type
+B :: Type
+X :: Type
+Y :: Type
+-- note that `(A, B) :: Type` is not relevant here
+
+-- Arrow TYPE (A , B) (X , Y) : Object TYPE
+A -> X :: Type
+B -> Y :: Type
+data Cross c d a b x y = Comma (c a x) (d b y)
+Cross (->) (->) A B X Y :: Type
+
+-- (f , g) :: Arrow (TYPE × TYPE) (A , B) (X , Y)
+f :: A -> X
+g :: B -> Y
+Comma f g :: Cross (->) (->) A B X Y
+
+-- Arrow CAT (TYPE × TYPE) TYPE
+Type -> Type -> Type :: Kind
+
+-- Arrow (TYPE × TYPE) (A , B) _ : Arrow CAT (TYPE × TYPE) TYPE
+(Cross (->) (->)) A B :: Type -> Type -> Type
+
+-- TODO: bimap
 ```
 
