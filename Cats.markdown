@@ -80,7 +80,8 @@ Other than CAT we will only really consider locally small categories.
 
 When we write `f : Arrow C X Y`, the `Arrow C X Y` bit is the hom-set.
 
-So we can think of `f` as being a term of type `C X Y`.
+So we can think of `f` as being a term of type `{Arrow C X Y}` (what ever that
+type may be).
 
 ```haskell
 -- category
@@ -169,9 +170,6 @@ Hom-set 'constructor' `Arrow C X` is a functor from C to TYPE:
 -- get a functor from C to TYPE
 -- Arrow C X : Arrow CAT C TYPE
 -- Which is therefore an arrow in CAT
-
--- can't write in haskell until
--- we know what category C is
 ```
 
 If we pick category C to be TYPE.
@@ -182,6 +180,8 @@ If we pick category C to be TYPE.
 X :: Type
 Y :: Type
 
+-- Arrows in TYPE are functions
+-- The hom-set is therefore a function type
 -- Arrow TYPE X Y : Object TYPE
 {Arrow TYPE X Y} :: Type
 {Arrow TYPE X Y} = X -> Y
@@ -192,6 +192,8 @@ f :: X -> Y
 {Arrow CAT TYPE TYPE} :: Kind
 {Arrow CAT TYPE TYPE} = Type -> Type
 
+-- chopping off the last argument gives us
+-- a functor from TYPE to TYPE
 -- Arrow TYPE X _ : Arrow CAT TYPE TYPE
 {Arrow TYPE X _} :: Type -> Type
 {Arrow TYPE X _} = (->) X
@@ -209,7 +211,6 @@ A :: Type
 B :: Type
 X :: Type
 Y :: Type
--- note that `(A, B) :: Type` is not relevant here
 
 -- Arrow TYPE (A , B) (X , Y) : Object TYPE
 A -> X :: Type
@@ -221,10 +222,10 @@ data TxT a b x y = TxTComma (a -> x) (b -> y)
 {Arrow (TYPE × TYPE) (A , B) (X , Y)}
   = TxT A B X Y
 
--- (f , g) :: Arrow (TYPE × TYPE) (A , B) (X , Y)
+-- (f , g) : Arrow (TYPE × TYPE) (A , B) (X , Y)
 f :: A -> X
 g :: B -> Y
-TxTComma f g :: TxT (->) (->) A B X Y
+{(f , g)} = TxTComma f g :: TxT A B X Y
 
 {Arrow CAT (TYPE × TYPE) TYPE} :: Kind
 {Arrow CAT (TYPE × TYPE) TYPE}
