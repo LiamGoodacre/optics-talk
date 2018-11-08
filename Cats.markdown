@@ -111,7 +111,7 @@ Arrows in C × D represent pairs of arrows, one from C, one from D.
 
 There is a category TYPE whose objects represent types and arrows represent functions.
 
-The hom-sets of every locally small category represent objects in TYPE.
+The hom-sets of every locally small category are represented by objects in TYPE.
 
 ```
 -- X : Object C
