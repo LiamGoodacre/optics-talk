@@ -68,7 +68,7 @@ Some hom-sets represent types/small-sets.
 
 A category in which every hom-set is a type/set is called 'locally small'.
 
-There is a category CAT in which objects represent locally small categories and objects
+There is a category CAT in which objects represent locally small categories and arrows
 represent functors.  CAT is not locally small.
 
 Other than CAT we will only really consider locally small categories.
