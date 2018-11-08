@@ -62,11 +62,11 @@ objects, but it can merge them.
 
 Intuition: a functor is a picture of one category in another.
 
-A hom-set is the collection of arrows from one object to another.
+A hom-set is the 'collection' of arrows from one object to another.
 
-Some hom-sets represent types/small-sets.
+Sometimes this 'collection' is a type.
 
-A category in which every hom-set is a type/set is called 'locally small'.
+A category in which every hom-set is a type is called 'locally small'.
 
 There is a category CAT in which objects represent locally small categories and arrows
 represent functors.  CAT is not locally small.
