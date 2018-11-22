@@ -148,7 +148,7 @@ composition `(.)` is a function.
 Unsaturated composition `(.)` is itself an arrow in TYPE.
 
 ```haskell
--- (.) : Arrow TYPE (C Y Z) (C X Y -> C X Z)
+(.) :: {Arrow TYPE (Arrow C Y Z) (Arrow C X Y -> Arrow C X Z)}
 ```
 
 Hom-set 'constructor' `Arrow C X` is a functor from C to TYPE:
