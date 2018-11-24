@@ -1,6 +1,22 @@
-A category C consists of objects & arrows.
+---
+title: cats
+author: Liam Goodacre
+patat:
+  wrap: true
+  slideLevel: 2
+  theme:
+    codeBlock: [bold, onDullBlack]
+...
 
-Objects are names that represent something.
+# Category Theory & Haskell
+
+## Definition - Category
+
+A *category* `C` consists of *objects* & *arrows*.
+
+## Definition - Objects
+
+An *object* is a name that represents something.
 
 ```haskell
 -- X : Object C
@@ -8,7 +24,9 @@ Objects are names that represent something.
 -- Z : Object C
 ```
 
-An arrow represents a connection between two objects.
+## Definition - Arrows
+
+An *arrow* represents a connection between two *objects*.
 
 ```haskell
 -- f : Arrow C X Y
@@ -16,28 +34,53 @@ An arrow represents a connection between two objects.
 -- h : Arrow C Z X
 ```
 
-For arrow `f`, `X` is the source/domain object, and `Y` is the target/codomain object.
+For *arrow* `f`:
 
-Notation: when in haskell I will use braces `{` & `}` to encase category theory
-expressions.  For example `f :: {Arrow C X Y}` will mean: when we work out what
-`Arrow C X Y` is, we can substitute it in.  Suppose we find out that
-`{Arrow C X Y}` is the type `X -> Y`, then we will end up with `f :: X -> Y`.
+* `X` is the source/domain *object*
+* `Y` is the target/codomain *object*
 
-Two arrows with the same source and target aren't necessarily the same arrow.
+Two *arrows* with the same source and target *object* aren't necessarily the
+same arrow.
 
-For each object there is an identity arrow, whose source and target is that
-object:
+## Notation (in this talk)
+
+When in Haskell I will use braces `{` & `}` to encase category theory
+expressions.
+
+For example:
 
 ```haskell
--- id @X : Arrow C X X
--- id @Y : Arrow C Y Y
--- id @Z : Arrow C Z Z
+f :: {Arrow C X Y}
 ```
 
-An arrow whose source and target objects are the same isn't necessarily an
-identity arrow.  But an identity arrow must exist.
+...will mean: when we work out what `Arrow C X Y` is, we can substitute it in.
 
-Any two compatible arrows can be composed:
+Suppose we find out that `{Arrow C X Y}` is the type `X -> Y`, then we will end
+up with:
+
+```haskell
+f :: X -> Y
+```
+
+## Identity
+
+For each *object* there is an identity *arrow*, whose source and target is that
+*object*:
+
+```haskell
+-- id X : Arrow C X X
+-- id Y : Arrow C Y Y
+-- id Z : Arrow C Z Z
+```
+
+An *arrow* whose source and target *objects* are the same isn't necessarily an
+identity *arrow*.
+
+But an identity *arrow* must exist.
+
+## Composition
+
+Any two compatible *arrows* can be composed:
 
 ```haskell
 -- f : Arrow C X Y
@@ -51,34 +94,40 @@ Composition is associative:
 -- h . (g . f) = (h . g) . f
 ```
 
-Composition with an identity arrow does nothing:
+Composition with an identity *arrow* does nothing:
 
 ```haskell
 -- h . id = h
 -- h = id . h
 ```
 
-Mappings between categories are called functors.
+## Functors
 
-Functors map every object and arrow from one category to another.
+Mappings between *categories* are called *functors*.
 
-To be a functor, this mapping cannot delete or disconnect any arrows or
-objects, but it can merge them.
+*Functors* map every *object* and *arrow* from one *category* to another.
 
-Intuition: a functor is a picture of one category in another.
+To be a *functor*, this mapping cannot delete or disconnect any *arrows* or
+*objects*, but it can merge them.
 
-A hom-set is the 'collection' of arrows from one object to another.
+Intuition: a *functor* is a picture of one *category* in another.
+
+## Hom-set
+
+A *hom-set* is the 'collection' of *arrows* from one *object* to another.
 
 Sometimes this 'collection' is a type.
 
-A category in which every hom-set is a type is called 'locally small'.
+A *category* in which every *hom-set* is a type is called 'locally small'.
 
-There is a category CAT in which objects represent locally small categories and arrows
-represent functors.  CAT is not locally small.
+There is a *category* `CAT` in which *objects* represent locally small
+categories and *arrows* represent *functors*.  `CAT` is not locally small.
 
-Other than CAT we will only really consider locally small categories.
+Other than `CAT` we will only really consider locally small *categories*.
 
-When we write `f : Arrow C X Y`, the `Arrow C X Y` bit is the hom-set.
+## Hom-set
+
+When we write `f : Arrow C X Y`, the `Arrow C X Y` bit is the `hom-set`.
 
 So we can think of `f` as being a term of type `{Arrow C X Y}` (what ever that
 type may be).
@@ -91,9 +140,11 @@ type may be).
 f :: {Arrow C X Y}
 ```
 
-For any two categories C and D, there is a category C × D.
+## TODO
 
-Objects in C × D represent pairs of objects, one from C, one from D.
+For any two *categories* `C` and `D`, there is a *category* `C × D`.
+
+*Objects* in `C × D` represent pairs of *objects*, one from `C`, one from `D`.
 
 ```haskell
 -- A : Object C
@@ -101,7 +152,9 @@ Objects in C × D represent pairs of objects, one from C, one from D.
 -- (A , B) : Object (C × D)
 ```
 
-Arrows in C × D represent pairs of arrows, one from C, one from D.
+## TODO
+
+*Arrows* in `C × D` represent pairs of *arrows*, one from `C`, one from `D`.
 
 ```haskell
 -- A : Object C
@@ -115,9 +168,13 @@ Arrows in C × D represent pairs of arrows, one from C, one from D.
 -- (f , g) : Arrow (C × D) (A , X) (B , Y)
 ```
 
-There is a category TYPE whose objects represent types and arrows represent functions.
+## TODO
 
-The hom-sets of every locally small category are represented by objects in TYPE.
+There is a *category* `TYPE` whose *objects* represent types and *arrows*
+represent functions.
+
+The *hom-sets* of every locally small *category* are represented by *objects*
+in TYPE.
 
 ```haskell
 -- X : Object C
@@ -138,20 +195,24 @@ g . f :: C X Z
 {Arrow C Y Z} :: Type
 ```
 
-In a locally small category, because hom-sets are types, it means that arrow
-composition `(.)` is a function.
+## TODO
+
+In a locally small *category*, because *hom-sets* are types, it means that
+*arrow* composition `(.)` is a function.
 
 ```haskell
 (.) :: {Arrow C Y Z} -> {Arrow C X Y} -> {Arrow C X Z}
 ```
 
-Unsaturated composition `(.)` is itself an arrow in TYPE.
+Unsaturated composition `(.)` is itself an *arrow* in `TYPE`.
 
 ```haskell
 (.) :: {Arrow TYPE (Arrow C Y Z) (Arrow C X Y -> Arrow C X Z)}
 ```
 
-Hom-set 'constructor' `Arrow C X` is a functor from C to TYPE:
+## TODO
+
+*Hom-set* 'constructor' `Arrow C X` is a *functor* from `C` to `TYPE`:
 
 ```haskell
 -- X : Object C
@@ -172,7 +233,9 @@ Hom-set 'constructor' `Arrow C X` is a functor from C to TYPE:
 -- Which is therefore an arrow in CAT
 ```
 
-If we pick category C to be TYPE.
+## TODO
+
+If we pick *category* `C` to be `TYPE`.
 
 ```haskell
 -- X : Object TYPE
@@ -202,7 +265,9 @@ f :: X -> Y
 
 ```
 
-If we pick category C to be TYPE × TYPE.
+## TODO
+
+If we pick *category* `C` to be `TYPE × TYPE`.
 
 ```haskell
 -- (A , B) : Object (TYPE × TYPE)
