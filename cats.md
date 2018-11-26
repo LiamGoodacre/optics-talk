@@ -39,7 +39,7 @@ A *category* `C` consists of:
        Y : Object C -}
     ```
 
-1. *arrows* - a directed relationship between two objects.
+1. *arrows* - a directed relationship between two *objects*.
     ```haskell
     {- f : X -C-> Y -}
     ```
@@ -50,7 +50,7 @@ A *category* `C` consists of:
 
 An *arrow* represents a connection between two *objects*.
 
-For example, when `f` is a *arrow* in *category* `C` from `X` to `Y`, we will write.
+Notationally, when `f` is a *arrow* in *category* `C` from `X` to `Y`, we will write.
 
 ```haskell
 {- f : X -C-> Y -}
@@ -117,7 +117,7 @@ When the *hom* are *types*, it means that *arrow* composition can be written as 
 
 ## Hom - Continued
 
-We will only really consider *categories* whose *hom* are *types*.
+We will only really consider *categories* whose *hom* are *types*.  (The 'locally small' *categories*)
 
 So, for example, we can have:
 
@@ -132,6 +132,8 @@ To know what the *type* `{- X -C-> Y -}` actually is, we will need to know what 
 ## Category TYPE - Types and Functions
 
 There is a *category* `TYPE` whose *objects* represent proper *types* and *arrows* represent functions (and have function *types*).
+
+Here we pun the name of an *object* to be the same as the name of the *type* that it represents.  So there is an *object* `Int` that represents the *type* `Int`:
 
 ```haskell
 {- Int : Object TYPE -}
@@ -167,7 +169,7 @@ __Note__: This does not necessarily mean that the Haskell representation of `(A 
 
 Just like with the *objects*, an *arrow* in `C × D` represents one *arrow* from `C` and one *arrow* from `D`.
 
-The notation for writing an *arrow* is the same *objects*: `(f , g)`.
+The notation for writing an *arrow* is (possibly confusingly) the same as with *objects*: `(f , g)` - except that `f` and `g` are *arrows* not *objects*.
 
 ```haskell
 {- f : A -C-> B
@@ -175,7 +177,8 @@ The notation for writing an *arrow* is the same *objects*: `(f , g)`.
    (f , g) : (A , X) -(C × D)-> (B , Y) -}
 ```
 
-Given the following *objects*:
+Assuming the following *objects* exist:
+
 ```haskell
 {- A : Object C
    B : Object C
@@ -189,18 +192,21 @@ Given the following *objects*:
 
 If we pair up `TYPE` with itself, we get the category `TYPE × TYPE` (`T×T` for short).
 
-An *object* represents two *types*.  __!__ not a tuple-type __!__
+An *object* represents two *types*.
+
+__!__ not necessarily a tuple of types or a tuple-type __!__
 
 An *arrow* represents two functions.
 
 ```haskell
 {- show : Int -TYPE-> String -}
+show ∷ Int → String
+
 {- isZero : Int -TYPE-> Boolean -}
+isZero ∷ Int → Boolean
+
 {- (show , isZero) :
      (Int , Int) -T×T-> (String, Boolean) -}
-
-show ∷ Int → String
-isZero ∷ Int → Boolean
 ```
 
 ## TYPE × TYPE - Arrows
@@ -255,8 +261,7 @@ So with an *object* `X`, we may refer to the *object* that a *functor* `F` maps 
 
 Similarly with an *arrow* `f`, we may refer to the *arrow* mapped to as `F f`.
 
-To be a *functor*, this mapping cannot delete or disconnect any *arrows* or
-*objects*, but it can merge them.
+To be a *functor*, this mapping cannot delete or disconnect any *arrows* or *objects*, but it can merge them.
 
 ## Functors - 2 and TYPE
 
@@ -273,6 +278,12 @@ id ∷ {- F fst -} → {- F fst -}
 ```
 
 And similarly for `snd`.
+
+`F` is a 'picture' of `2` in `TYPE`.  I.e. it is a selection of two *types* and their identity *functions*.
+
+Suppose `F` maps `fst` to `Int` and `snd` to `String`.  Notice how similar this is to an *object* in `TYPE × TYPE`.
+
+It's not only similar, a *functor* from `2` to `TYPE` is equivalent to the *category* `TYPE × TYPE`.
 
 # TODO
 
