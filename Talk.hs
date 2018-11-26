@@ -57,6 +57,7 @@ data DataCoprism a b s t =
   DataCoprism (s -> a) (b -> Either a t)
 
 
+
 type Exchange = DataIso
 type Shop = DataLens
 type Market = DataPrism
@@ -478,9 +479,33 @@ re ::
 re f = unRe (f (Re id))
 
 
+newtype Matched b s t =
+  Matched { unMatched :: b -> Maybe t }
+
+instance IsoFunctor (Matched b) where
+  isoMap = coprismMap . isoCoprism
+
+instance CoprismFunctor (Matched b) where
+  coprismMap (DataCoprism ix yxo) (Matched bmy) =
+    Matched (\b -> bmy b >>= \y -> case yxo y of
+                Left _ -> Nothing
+                Right o -> Just o)
+
 match ::
-  (DataCoprism a b a b -> DataCoprism a b s t) ->
-  b ->
-  Either a t
-match f = let DataCoprism _ g = f identityCoprism in g
+  (Matched b a b -> Matched b s t) ->
+  b -> Maybe t
+match f = unMatched (f (Matched Just))
+
+data Options = One | Two deriving Show
+showOptions :: Options -> String
+showOptions One = "ONE"
+showOptions Two = "TWO"
+readOptions :: String -> Either String Options
+readOptions "ONE" = Right One
+readOptions "TWO" = Right Two
+readOptions s = Left s
+optionsString :: Prism' Options String
+optionsString = prism readOptions showOptions
+stringOptions :: Coprism' String Options
+stringOptions = coprism showOptions readOptions
 
