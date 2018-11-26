@@ -7,7 +7,8 @@
   UnicodeSyntax,
   LambdaCase,
   ScopedTypeVariables,
-  TypeApplications
+  TypeApplications,
+  ConstraintKinds
 #-}
 
 module Talk where
@@ -52,6 +53,9 @@ data DataPrism a b s t =
 data DataEquality a b s t =
   DataEquality (DataEqual s a) (DataEqual b t)
 
+data DataCoprism a b s t =
+  DataCoprism (s -> a) (b -> Either a t)
+
 
 type Exchange = DataIso
 type Shop = DataLens
@@ -62,6 +66,7 @@ type DataIso' ab st = DataIso ab ab st st
 type DataLens' ab st = DataLens ab ab st st
 type DataPrism' ab st = DataPrism ab ab st st
 type DataEquality' ab st = DataEquality ab ab st st
+type DataCoprism' ab st = DataCoprism ab ab st st
 
 
 equalFun ::
@@ -82,6 +87,11 @@ isoPrism ::
   DataIso a b s t -> DataPrism a b s t
 isoPrism (DataIso sa bt) =
   DataPrism (Right . sa) bt
+
+isoCoprism ::
+  DataIso a b s t -> DataCoprism a b s t
+isoCoprism (DataIso sa bt) =
+  DataCoprism sa (Right . bt)
 
 
 identityFun ::
@@ -111,6 +121,11 @@ identityEquality ::
   DataEquality x y x y
 --DataEquality' xy xy
 identityEquality = DataEquality Refl Refl
+
+identityCoprism ::
+  DataCoprism x y x y
+--DataCoprism' xy xy
+identityCoprism = DataCoprism id Right
 
 
 composeFun ::
@@ -145,6 +160,16 @@ composeEquality ::
 composeEquality (DataEquality ix yo) (DataEquality xa by) =
   DataEquality (composeEqual xa ix) (composeEqual yo by)
 
+composeCoprism ::
+  DataCoprism x y i o -> (DataCoprism a b) x y -> (DataCoprism a b) i o
+--DataCoprism' xy io  -> (DataCoprism' ab) xy  -> (DataCoprism' ab) io
+composeCoprism (DataCoprism ix yxo) (DataCoprism xa bay) =
+  DataCoprism (xa . ix) (\b -> case bay b of
+                              Left a -> Left a
+                              Right y -> case yxo y of
+                                Left x -> Left (xa x)
+                                Right o -> Right o)
+
 
 -- class Functor f where
 class FunFunctor f where
@@ -172,6 +197,10 @@ class EqualityFunctor p where
   equalityMap :: DataEquality x y i o -> p x y -> p i o
   --          :: DataEquality' xy io  -> p xy  -> p io
 
+class IsoFunctor p => CoprismFunctor p where
+  coprismMap :: DataCoprism x y i o -> p x y -> p i o
+  --      :: DataCoprism' xy io  -> p xy  -> p io
+
 
 instance FunFunctor ((->) a) where
   funMap = composeFun
@@ -197,12 +226,18 @@ instance PrismFunctor (DataPrism a b) where
 instance EqualityFunctor p where
   equalityMap (DataEquality Refl Refl) x = x
 
+instance CoprismFunctor (DataCoprism a b) where
+  coprismMap = composeCoprism
+
 
 instance IsoFunctor (DataLens a b) where
   isoMap = lensMap . isoLens
 
 instance IsoFunctor (DataPrism a b) where
   isoMap = prismMap . isoPrism
+
+instance IsoFunctor (DataCoprism a b) where
+  isoMap = coprismMap . isoCoprism
 
 
 type Fun b c = ∀ f . FunFunctor f => f b -> f c
@@ -220,11 +255,14 @@ type Prism a b s t = ∀ p . PrismFunctor p => p a b -> p s t
 --   Equality s t a b = ∀ p . p a b -> p s t
 type Equality a b s t = ∀ p . EqualityFunctor p => p a b -> p s t
 
+type Coprism a b s t = ∀ p . CoprismFunctor p => p a b -> p s t
+
 
 type Iso' ab st = Iso ab ab st st
 type Lens' ab st = Lens ab ab st st
 type Prism' ab st = Prism ab ab st st
 type Equality' ab st = Equality ab ab st st
+type Coprism' ab st = Coprism ab ab st st
 
 
 toFun :: DataFun a b -> Fun a b
@@ -245,6 +283,9 @@ toPrism = prismMap
 toEquality :: DataEquality a b s t -> Equality a b s t
 toEquality = equalityMap
 
+toCoprism :: DataCoprism a b s t -> Coprism a b s t
+toCoprism = coprismMap
+
 
 fromFun :: Fun a b -> DataFun a b
 fromFun f = f identityFun
@@ -263,6 +304,9 @@ fromPrism f = f identityPrism
 
 fromEquality :: Equality a b s t -> DataEquality a b s t
 fromEquality f = f identityEquality
+
+fromCoprism :: Coprism a b s t -> DataCoprism a b s t
+fromCoprism f = f identityCoprism
 
 
 equal :: Equal a a
@@ -283,6 +327,9 @@ prism f g = toPrism (DataPrism f g)
 equality :: Equality a b a b
 equality = toEquality (DataEquality Refl Refl)
 
+coprism :: (s -> a) -> (b -> Either a t) -> Coprism a b s t
+coprism f g = toCoprism (DataCoprism f g)
+
 
 notted :: Iso' Bool Bool
 notted = iso not not
@@ -301,6 +348,26 @@ right = prism (lmap Left) Right
 
 left :: Prism a b (Either a x) (Either b x)
 left = prism (lmap Right . swap) Left
+
+unright :: Coprism (Either x a) (Either x b) a b
+unright = coprism Right (lmap Left)
+
+unleft :: Coprism (Either a x) (Either b x) a b
+unleft = coprism Left (lmap Right . swap)
+
+data Red = Red deriving Show
+data Green = Green deriving Show
+data Blue = Blue deriving Show
+data Colour = ColourRed Red | ColourGreen Green | ColourBlue Blue deriving Show
+
+red :: Prism' Red Colour
+red = re unred
+
+unred :: Coprism' Colour Red
+unred = ColourRed `coprism` \case
+  ColourRed r -> Right r
+  ColourGreen g -> Left (ColourGreen g)
+  ColourBlue b -> Left (ColourBlue b)
 
 eithered :: Iso' (Either () ()) Bool
 eithered = iso bte etb where
@@ -325,6 +392,15 @@ instance PrismFunctor (->) where
     case iox i of
       Left o -> o
       Right x -> yo (xy x)
+
+instance CoprismFunctor (->) where
+  coprismMap (DataCoprism ix yxo) xy i =
+    spinX (ix i)
+    where
+      spinX x =
+        case yxo (xy x) of
+          Left x -> spinX x
+          Right o -> o
 
 over ::
   ((a -> b) -> s -> t) ->
@@ -364,6 +440,10 @@ instance Monoid r => PrismFunctor (Forget r) where
                     Left _o -> mempty
                     Right x -> xr x)
 
+instance CoprismFunctor (Forget r) where
+  coprismMap (DataCoprism ix _yxo) (Forget xr) =
+    Forget (xr . ix)
+
 view ::
   (Forget a a b -> Forget a s t) ->
   s -> a
@@ -384,8 +464,23 @@ instance IsoFunctor p => IsoFunctor (Re p a b) where
   isoMap (DataIso ix yo) (Re yxba) =
     Re (yxba . isoMap (DataIso yo ix))
 
+instance PrismFunctor p => CoprismFunctor (Re p a b) where
+  coprismMap (DataCoprism ix yxo) (Re yxba) =
+    Re (yxba . prismMap (DataPrism yxo ix))
+
+instance CoprismFunctor p => PrismFunctor (Re p a b) where
+  prismMap (DataPrism iox yo) (Re yxba) =
+    Re (yxba . coprismMap (DataCoprism yo iox))
+
 re ::
   (Re p a b a b -> Re p a b s t) ->
   p t s -> p b a
 re f = unRe (f (Re id))
+
+
+match ::
+  (DataCoprism a b a b -> DataCoprism a b s t) ->
+  b ->
+  Either a t
+match f = let DataCoprism _ g = f identityCoprism in g
 
