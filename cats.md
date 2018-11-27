@@ -279,9 +279,13 @@ id ∷ {- F fst -} → {- F fst -}
 
 And similarly for `snd`.
 
-`F` is a 'picture' of `2` in `TYPE`.  I.e. it is a selection of two *types* and their identity *functions*.
+## Functors - 2 and TYPE (Continued)
 
-Suppose `F` maps `fst` to `Int` and `snd` to `String`.  Notice how similar this is to an *object* in `TYPE × TYPE`.
+`F` is like a 'picture' of `2` in `TYPE`.  I.e. it is a selection of two *types* and their identity *functions*.
+
+Suppose `F fst` is `Int` and `F snd` is `String`.
+
+Notice how similar this is to an *object* in `TYPE × TYPE`.
 
 It's not only similar, a *functor* from `2` to `TYPE` is equivalent to the *category* `TYPE × TYPE`.
 
