@@ -41,7 +41,7 @@ A *category* `C` consists of:
 
 1. *arrows* - a directed relationship between two *objects*.
     ```haskell
-    {- f : X -C-> Y -}
+    {- f : X `C` Y -}
     ```
 
 1. *laws* - properties that must be true regarding all *objects* and *arrows* in the *category*.
@@ -53,7 +53,7 @@ An *arrow* represents a connection between two *objects*.
 Notationally, when `f` is a *arrow* in *category* `C` from `X` to `Y`, we will write.
 
 ```haskell
-{- f : X -C-> Y -}
+{- f : X `C` Y -}
 ```
 
 For *arrow* `f`:
@@ -70,8 +70,8 @@ But when all pairs of *arrows* like this are necessarily the same, the *category
 For each *object* there is an identity *arrow*, whose source and target is that *object*:
 
 ```haskell
-{- id X : X -C-> X
-   id Y : Y -C-> Y
+{- id X : X `C` X
+   id Y : Y `C` Y
    ... -}
 ```
 
@@ -84,9 +84,9 @@ But an identity *arrow* must exist for each *object*.
 Any two compatible *arrows* can be composed:
 
 ```haskell
-{- f : X -C-> Y
-   g : Y -C-> Z
-   g ∘ f : X -C-> Z -}
+{- f : X `C` Y
+   g : Y `C` Z
+   g ∘ f : X `C` Z -}
 ```
 
 As `Y` is both the source of `g` and the target of `f`, we compose them to get `g ∘ f`.
@@ -103,17 +103,17 @@ Where ⇔ denotes some appropriate kind of equivalence.
 
 A *hom* is the 'collection' of *arrows* from one *object* to another.
 
-When we write `f : X -C-> Y`, the `X -C-> Y` bit is the *hom*.
+When we write ``f : X `C` Y``, the ``X `C` Y`` bit is the *hom*.
 
 Sometimes this 'collection' is a proper *type*.
 
 ```haskell
-{- X -C-> Y -} ∷ Type
+{- X `C` Y -} ∷ Type
 ```
 
 A *category* in which every *hom* is a proper *type* is called 'locally small'.
 
-When the *hom* are *types*, it means that *arrow* composition can be written as a function.
+When the *hom* are proper *types*, it means that specific *arrows* correspond with terms in and *arrow* composition can be written as a function.
 
 ## Hom - Continued
 
@@ -122,12 +122,12 @@ We will only really consider *categories* whose *hom* are *types*.  (The 'locall
 So, for example, we can have:
 
 ```haskell
-f ∷ {- X -C-> Y -}
+f ∷ {- X `C` Y -}
 ```
 
-That is, `f` is a *term* of *type* `{- X -C-> Y- }` (what ever that *type* may be).
+That is, `f` is a *term* of *type* ``{- X `C` Y- }`` (what ever that *type* may be).
 
-To know what the *type* `{- X -C-> Y -}` actually is, we will need to know what *category* `C` is.
+To know what the *type* ``{- X `C` Y -}`` actually is, we will need to know what *category* `C` is.
 
 ## Category TYPE - Types and Functions
 
@@ -142,10 +142,10 @@ Here we pun the name of an *object* to be the same as the name of the *type* tha
 {- String : Object TYPE -}
    String ∷ Type
 
-{- Int -TYPE-> String -}
+{- Int `TYPE` String -}
    Int → String ∷ Type
 
-{- show : Int -TYPE-> String -}
+{- show : Int `TYPE` String -}
    show ∷ Int → String
 ```
 
@@ -172,9 +172,9 @@ Just like with the *objects*, an *arrow* in `C × D` represents one *arrow* from
 The notation for writing an *arrow* is (possibly confusingly) the same as with *objects*: `(f , g)` - except that `f` and `g` are *arrows* not *objects*.
 
 ```haskell
-{- f : A -C-> B
-   g : X -D-> Y
-   (f , g) : (A , X) -(C × D)-> (B , Y) -}
+{- f : A `C` B
+   g : X `D` Y
+   (f , g) : (A , X) `(C × D)` (B , Y) -}
 ```
 
 Assuming the following *objects* exist:
@@ -190,7 +190,7 @@ Assuming the following *objects* exist:
 
 ## TYPE × TYPE
 
-If we pair up `TYPE` with itself, we get the category `TYPE × TYPE` (`T×T` for short).
+If we pair up `TYPE` with itself, we get the category `TYPE × TYPE`.
 
 An *object* represents two *types*.
 
@@ -199,22 +199,22 @@ __!__ not necessarily a tuple of types or a tuple-type __!__
 An *arrow* represents two functions.
 
 ```haskell
-{- show : Int -TYPE-> String -}
+{- show : Int `TYPE` String -}
 show ∷ Int → String
 
-{- isZero : Int -TYPE-> Boolean -}
+{- isZero : Int `TYPE` Boolean -}
 isZero ∷ Int → Boolean
 
 {- (show , isZero) :
-     (Int , Int) -T×T-> (String, Boolean) -}
+     (Int , Int) `TYPE × TYPE` (String , Boolean) -}
 ```
 
 ## TYPE × TYPE - Arrows
 
-Recall that *arrows* in a locally small *category* can be represented by a *type*.  In `TYPE × TYPE` this could look something like the following:
+Recall that *homs* in a locally small *category* correspond with particular types.  And therefore an *arrow* is a term of a given *hom* type.  In `TYPE × TYPE` this could look something like the following:
 
 ```haskell
-{- (a , b) -T×T-> (s , t) -}
+{- (a , b) `TYPE × TYPE` (s , t) -}
 data Arrow a b s t = Comma (a → s) (b → t)
 ```
 
@@ -222,7 +222,7 @@ Here, an *object* `(a , b)` is represented by two *type* parameters to the `Arro
 
 ```haskell
 {- (show , isZero) :
-     (Int , Int) -T×T-> (String , Boolean) -}
+     (Int , Int) `TYPE × TYPE` (String , Boolean) -}
 
 Comma show isZero ∷
   Arrow Int Int String Boolean
@@ -231,7 +231,7 @@ Comma show isZero ∷
 ## TYPE × TYPE - Composition
 
 ```haskell
-{- (a , b) -T×T-> (s , t) -}
+{- (a , b) `TYPE × TYPE` (s , t) -}
 data Arrow a b s t = Comma (a → s) (b → t)
 ```
 
@@ -246,7 +246,7 @@ compose (Comma xi yo) (Comma ax by) =
   Comma (xi . ax) (yo . by)
 
 identity ∷ Arrow x y x y
-identity = Comma identity identity
+identity = Comma id id
 ```
 
 ## Functors
@@ -263,6 +263,11 @@ Similarly with an *arrow* `f`, we may refer to the *arrow* mapped to as `F f`.
 
 To be a *functor*, this mapping cannot delete or disconnect any *arrows* or *objects*, but it can merge them.
 
+We required that:
+
+* Identity law: ``F (id : X `C` X)`` ⇔ ``id : F X `C` F X``
+* Composition law: ``F (g ∘ f)`` ⇔ ``F g ∘ F f``
+
 ## Functors - 2 and TYPE
 
 Consider a *category* `2` with only two *objects* (`fst` and `snd`) and only identity *arrows*.
@@ -271,7 +276,7 @@ Any *functor* `F` from `2` to `TYPE`:
 
 Maps `fst : Object 2` to a *type* `F fst : Object TYPE`.
 
-Maps from the *arrow* ```id fst``` to ```F (id fst)``` which is ```id (F fst) : F fst -TYPE-> F fst```.  This a function:
+Maps from the *arrow* ```id fst``` to ```F (id fst)``` which is ```id (F fst) : F fst `TYPE` F fst```.  This a function:
 
 ```haskell
 id ∷ {- F fst -} → {- F fst -}
