@@ -13,6 +13,13 @@ patat:
 
 # Category Theory & Haskell
 
+## Prerequisites
+
+* Terms
+* Types
+* Type constructors
+* Kinds
+
 ## Notation in this talk
 
 When in Haskell I will use comment braces `{- -}` to encase category theory expressions.
@@ -70,8 +77,8 @@ But when all pairs of *arrows* like this are necessarily the same, the *category
 For each *object* there is an identity *arrow*, whose source and target is that *object*:
 
 ```haskell
-{- id X : X `C` X
-   id Y : Y `C` Y
+{- identity X : X `C` X
+   identity Y : Y `C` Y
    ... -}
 ```
 
@@ -94,8 +101,8 @@ As `Y` is both the source of `g` and the target of `f`, we compose them to get `
 The following properties hold:
 
 - Associativity: `h ∘ (g ∘ f)` ⇔ `(h ∘ g) ∘ f`
-- Left identity: `id C ∘ h` ⇔ `h`
-- Right identity: `h` ⇔ `h ∘ id C`
+- Left identity: `identity C ∘ h` ⇔ `h`
+- Right identity: `h` ⇔ `h ∘ identity C`
 
 Where ⇔ denotes some appropriate kind of equivalence.
 
@@ -246,7 +253,7 @@ compose (Comma xi yo) (Comma ax by) =
   Comma (xi . ax) (yo . by)
 
 identity ∷ Arrow x y x y
-identity = Comma id id
+identity = Comma identity identity
 ```
 
 ## Functors
@@ -265,7 +272,7 @@ To be a *functor*, this mapping cannot delete or disconnect any *arrows* or *obj
 
 We required that:
 
-* Identity law: ``F (id : X `C` X)`` ⇔ ``id : F X `C` F X``
+* Identity law: ``F (identity : X `C` X)`` ⇔ ``identity : F X `C` F X``
 * Composition law: ``F (g ∘ f)`` ⇔ ``F g ∘ F f``
 
 ## Functors - 2 and TYPE
@@ -276,10 +283,10 @@ Any *functor* `F` from `2` to `TYPE`:
 
 Maps `fst : Object 2` to a *type* `F fst : Object TYPE`.
 
-Maps from the *arrow* ```id fst``` to ```F (id fst)``` which is ```id (F fst) : F fst `TYPE` F fst```.  This a function:
+Maps from the *arrow* ```identity fst``` to ```F (identity fst)``` which is ```identity (F fst) : F fst `TYPE` F fst```.  This a function:
 
 ```haskell
-id ∷ {- F fst -} → {- F fst -}
+identity ∷ {- F fst -} → {- F fst -}
 ```
 
 And similarly for `snd`.
@@ -296,7 +303,7 @@ It's not only similar, a *functor* from `2` to `TYPE` is equivalent to the *cate
 
 # TODO
 
-The *hom* 'constructor' `Arrow C X` is a *functor* from `C` to `TYPE`:
+The *hom* 'constructor' ``(X `C` _)`` is a *functor* from `C` to `TYPE`:
 
 ```haskell
 -- X : Object C
@@ -305,8 +312,8 @@ The *hom* 'constructor' `Arrow C X` is a *functor* from `C` to `TYPE`:
 -- C : Object CAT
 -- TYPE : Object CAT
 
--- Arrow C X Y : Object TYPE
-{Arrow C X Y} :: Type
+-- X `C` Y : Object TYPE
+{X `C` Y} :: Type
 
 -- Recall that for every functor between locally
 -- small categories there exists an arrow in CAT.
@@ -327,21 +334,21 @@ Y :: Type
 
 -- Arrows in TYPE are functions
 -- The hom is therefore a function type
--- Arrow TYPE X Y : Object TYPE
-{Arrow TYPE X Y} :: Type
-{Arrow TYPE X Y} = X -> Y
+-- X `TYPE` Y : Object TYPE
+{X `TYPE` Y} :: Type
+{X `TYPE` Y} = X → Y
 
--- f : Arrow TYPE X Y
+-- f : X `TYPE` Y
 f :: X -> Y
 
-{Arrow CAT TYPE TYPE} :: Kind
-{Arrow CAT TYPE TYPE} = Type -> Type
+{- TYPE `CAT` TYPE -} :: Kind
+{- TYPE `CAT` TYPE -} = Type → Type
 
 -- chopping off the last argument gives us
 -- a functor from TYPE to TYPE
 -- Arrow TYPE X _ : Arrow CAT TYPE TYPE
-{Arrow TYPE X _} :: Type -> Type
-{Arrow TYPE X _} = (->) X
+{- (X `TYPE` _) -} :: Type → Type
+{- (X `TYPE' _) -} = (→) X
 
 -- TODO: fmap
 ```
@@ -357,8 +364,8 @@ X :: Type
 Y :: Type
 
 -- Arrow TYPE (A , B) (X , Y) : Object TYPE
-A -> X :: Type
-B -> Y :: Type
+A → X ∷ Type
+B → Y ∷ Type
 
 data TxT a b x y = TxTComma (a -> x) (b -> y)
 
