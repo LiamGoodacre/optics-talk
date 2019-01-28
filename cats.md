@@ -31,7 +31,7 @@ f ∷ X → Y
 
 ## Category
 
-A *category* `C` consists of:
+All *categories*, `C`, are an abstraction that consists of:
 
 1. *objects* - names that represent "something".
     ```haskell
@@ -39,12 +39,20 @@ A *category* `C` consists of:
        Y : Object C -}
     ```
 
-1. *arrows* - a directed relationship between two *objects*.
+1. *arrows* - represent directed relationship between two *objects*.
     ```haskell
     {- f : X `C` Y -}
     ```
 
-1. *laws* - properties that must be true regarding all *objects* and *arrows* in the *category*.
+1. *laws* - properties regarding all *objects* and *arrows* in the *category*.
+
+It's common to identify a concept with the *object*/*arrow* representing it.  For example:
+
+1. The type `Int` __is__ an *object* in the *category* `TYPE`.
+
+1. The function `show ∷ Int → String` __is__ an *arrow* in the *category* `TYPE`.
+
+This can be convenient, if a little confusing.
 
 ## Arrows
 
@@ -65,7 +73,7 @@ Two *arrows* with the same source and target *object* aren't necessarily the sam
 
 But when all pairs of *arrows* like this are necessarily the same, the *category* is described as 'thin'.
 
-## Identity
+## Laws - Identity
 
 For each *object* there is an identity *arrow*, whose source and target is that *object*:
 
@@ -79,7 +87,7 @@ An *arrow* whose source and target *objects* are the same isn't necessarily an i
 
 But an identity *arrow* must exist for each *object*.
 
-## Composition
+## Laws - Composition
 
 Any two compatible *arrows* can be composed:
 
@@ -113,7 +121,9 @@ Sometimes this 'collection' is a proper *type*.
 
 A *category* in which every *hom* is a proper *type* is called 'locally small'.
 
-When the *hom* are proper *types*, it means that specific *arrows* correspond with terms in and *arrow* composition can be written as a function.
+When the *hom* are proper *types*, it means that each *arrow* in the *hom* corresponds with a term in a type; and *arrow* composition can be implemented by a function.
+
+Though whether or not such terms are easily expressible or even possible in Haskell is a separate issue.
 
 ## Hom - Continued
 
@@ -163,7 +173,7 @@ An *object* in `C × D` represents one *object* from `C` and one *object* from `
    (A , B) : Object (C × D) -}
 ```
 
-__Note__: This does not necessarily mean that the Haskell representation of `(A , B)` is a tuple, a tuple-type, or even a proper type at all!
+__Note__: This does not necessarily mean that a Haskell representation of `(A , B)` is a tuple, a tuple-type, or even a proper type at all!
 
 ## Category of pairs - Arrows
 
@@ -177,7 +187,7 @@ The notation for writing an *arrow* is (possibly confusingly) the same as with *
    (f , g) : (A , X) `(C × D)` (B , Y) -}
 ```
 
-Assuming the following *objects* exist:
+Assuming the following context of *objects*:
 
 ```haskell
 {- A : Object C
@@ -294,9 +304,54 @@ Notice how similar this is to an *object* in `TYPE × TYPE`.
 
 It's not only similar, a *functor* from `2` to `TYPE` is equivalent to the *category* `TYPE × TYPE`.
 
-# TODO
+## Functors - CAT
 
-The *hom* 'constructor' ``(X `C` _)`` is a *functor* from `C` to `TYPE`:
+This is the only point we will mention a *category* that is not locally small.
+
+A *category* `CAT`, has *objects* that correspond with locally small *categories*, and *arrows* that represent *functors* between *categories*.
+
+To write the *hom* of a *functor* from a *category* `C` to a *category* `D` I will write ``C `Cat` D``.
+
+## Functors - Hom (covariant)
+
+For the *hom* type of any locally small *category* `C` and *object* `X`,
+
+There is a *functor* ``(X `C` _)`` from `C` to `TYPE`:
+
+```haskell
+{- (X `C` _) : C `Cat` TYPE -}
+```
+
+This *functor*:
+
+* maps *objects* `Y`
+
+    from ``(X `C` _) Y`` to the *hom* ``(X `C` Y)``.
+
+* maps *arrows* ``f : (I `C` O)`` to ``(X `C` f) : ...`` via composition:
+
+    ```haskell
+    {- (X `C` _) -} ∷
+      {- (I `C` O) -} →
+      {- (X `C` _) I -} →
+      {- (X `C` _) O -}
+
+    {- (X `C` f) -} ∷
+      {- (X `C` I) I -} →
+      {- (X `C` O) O -}
+
+    (f ∘ _) ∷
+      {- (X `C` I) I -} →
+      {- (X `C` O) O -}
+    ```
+
+## Functors - Hom (covariant) - Laws
+
+## Categories - opposite
+
+## Functors - Hom (contravariant)
+
+## TODO TODO
 
 ```haskell
 -- X : Object C
