@@ -13,13 +13,6 @@ patat:
 
 # Category Theory & Haskell
 
-## Prerequisites
-
-* Terms
-* Types
-* Type constructors
-* Kinds
-
 ## Notation in this talk
 
 When in Haskell I will use comment braces `{- -}` to encase category theory expressions.
