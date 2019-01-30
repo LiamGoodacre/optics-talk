@@ -113,7 +113,7 @@ A *hom* is the 'collection' of *arrows* from one *object* to another.
 
 When we write ``f : X `C` Y``, the ``X `C` Y`` bit is the *hom*.
 
-Sometimes this 'collection' is a proper *type*.
+Sometimes this 'collection' is a proper *type* (a type that classifies value-level expressions).
 
 ```haskell
 {- X `C` Y -} ∷ Type
