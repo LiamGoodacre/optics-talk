@@ -15,7 +15,7 @@ flip id :: A -> (∀ r . (A -> r) -> r)
 
 With `Tuple A A` and `Tuple A A` we have the trivial equality relationship as
 above.  But, we also have a 'swapping' relationship.  That is, with any
-computation involving `Tuple A A`, we could think on an equivalent computation
+computation involving `Tuple A A`, we could think of an equivalent computation
 that consistently swapped the first and second components of the tuples
 involved.
 
